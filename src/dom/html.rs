@@ -1,3 +1,4 @@
+use html_escape::{decode_html_entities, encode_text};
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use serde::Serialize;
 use std::borrow::{Borrow, Cow};
@@ -59,6 +60,14 @@ pub struct Text<'a>(pub Cow<'a, str>);
 impl<'a> Text<'a> {
     pub fn as_str(&self) -> &str {
         self.0.borrow()
+    }
+
+    pub fn decode(&self) -> Cow<'_, str> {
+        decode_html_entities(self.as_str())
+    }
+
+    pub fn encode(s: &'a str) -> Self {
+        Self(encode_text(s))
     }
 }
 
