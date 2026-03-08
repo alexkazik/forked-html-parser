@@ -47,7 +47,7 @@ pub struct Element {
 
     /// Span of the element in the parsed source
     #[serde(skip)]
-    pub source_span: SourceSpan
+    pub source_span: SourceSpan,
 }
 
 impl Default for Element {
@@ -59,7 +59,7 @@ impl Default for Element {
             classes: vec![],
             attributes: HashMap::new(),
             children: vec![],
-            source_span: SourceSpan::default()
+            source_span: SourceSpan::default(),
         }
     }
 }
