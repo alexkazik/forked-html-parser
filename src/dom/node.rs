@@ -1,9 +1,11 @@
 use super::element::Element;
 use crate::Text;
 use crate::for_each::ForEach;
+use html_escape::decode_html_entities;
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use serde::Serialize;
 use std::array;
+use std::borrow::Cow;
 
 #[derive(Debug, Serialize, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
 #[serde(untagged)]
@@ -82,6 +84,27 @@ impl Node<'_> {
                 writer.push_str(c);
                 writer.push_str("-->");
             }
+        }
+    }
+
+    /// Strip all tags.
+    ///
+    /// Note that html entities are not removed, only tags.
+    /// Use [`Self::to_text`], or [`Text::decode`] on the result.
+    pub fn strip_tags(&self) -> Text<'_> {
+        match self {
+            Node::Text(t) => t.to_borrowed(),
+            Node::Element(e) => e.strip_tags(),
+            Node::Comment(_) => "".into(),
+        }
+    }
+
+    /// Strip tags and decode html-entities.
+    pub fn to_text(&self) -> Cow<'_, str> {
+        let t = self.strip_tags().0;
+        match decode_html_entities(&t) {
+            Cow::Borrowed(_) => t, // it's only returned as borrowed if the whole input is passed though
+            Cow::Owned(o) => Cow::Owned(o),
         }
     }
 }

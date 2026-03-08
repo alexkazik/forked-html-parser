@@ -3,7 +3,8 @@ use super::node::{Node, write_html_list};
 use super::span::SourceSpan;
 use crate::dom::vecmap::VecMap;
 use crate::for_each::ForEach;
-use crate::{Attribute, VecSet};
+use crate::{Attribute, Text, VecSet};
+use html_escape::decode_html_entities;
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use serde::Serialize;
 use std::borrow::Cow;
@@ -139,6 +140,39 @@ impl Element<'_> {
         } else {
             writer.push('/');
             writer.push('>');
+        }
+    }
+
+    /// Strip all tags.
+    ///
+    /// Note that html entities are not removed, only tags.
+    /// Use [`Self::to_text`], or [`Text::decode`] on the result.
+    pub fn strip_tags(&self) -> Text<'_> {
+        if let &[Node::Text(t)] = &self.children.as_slice() {
+            t.to_borrowed()
+        } else {
+            let mut result = String::new();
+            self.write_strip_tags(&mut result);
+            Text(result.into())
+        }
+    }
+
+    fn write_strip_tags(&self, writer: &mut String) {
+        for c in &self.children {
+            match c {
+                Node::Text(t) => writer.push_str(t),
+                Node::Element(e) => e.write_strip_tags(writer),
+                Node::Comment(_) => (),
+            }
+        }
+    }
+
+    /// Strip tags and decode html-entities.
+    pub fn to_text(&self) -> Cow<'_, str> {
+        let t = self.strip_tags().0;
+        match decode_html_entities(&t) {
+            Cow::Borrowed(_) => t, // it's only returned as borrowed if the whole input is passed though
+            Cow::Owned(o) => Cow::Owned(o),
         }
     }
 }
