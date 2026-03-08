@@ -1,4 +1,5 @@
 use crate::VecMap;
+use ownable::traits::{IntoOwned, ToBorrowed, ToOwned};
 use serde::{Serialize, Serializer};
 use std::borrow::Borrow;
 use std::fmt::{Debug, Formatter};
@@ -83,6 +84,28 @@ impl<K> Iterator for IntoIter<K> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next()
+    }
+}
+
+impl<'a, K: ToBorrowed<'a>> ToBorrowed<'a> for VecSet<K> {
+    fn to_borrowed(&'a self) -> Self {
+        VecSet(VecMap(self.iter().map(|k| (k.to_borrowed(), ())).collect()))
+    }
+}
+
+impl<K: ToOwned> ToOwned for VecSet<K> {
+    type Owned = VecSet<K::Owned>;
+    fn to_owned(&self) -> Self::Owned {
+        VecSet(VecMap(self.iter().map(|k| (k.to_owned(), ())).collect()))
+    }
+}
+
+impl<K: IntoOwned> IntoOwned for VecSet<K> {
+    type Owned = VecSet<K::Owned>;
+    fn into_owned(self) -> Self::Owned {
+        VecSet(VecMap(
+            self.into_iter().map(|k| (k.into_owned(), ())).collect(),
+        ))
     }
 }
 

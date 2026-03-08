@@ -201,7 +201,7 @@ fn it_can_clone_node() {
     "
     );
     let dom = Dom::parse(html).unwrap();
-    let one = dom.children[0].clone();
+    let one = dom.children[0].to_owned();
     assert_json_snapshot!(one);
 }
 #[test]
@@ -219,7 +219,7 @@ fn it_can_clone_dom() {
     "
     );
     let dom = Dom::parse(html).unwrap();
-    let dom_clone = dom.clone();
+    let dom_clone = dom.to_owned();
     assert_eq!(dom, dom_clone);
 }
 

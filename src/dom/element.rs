@@ -1,9 +1,11 @@
 use super::node::Node;
 #[cfg(feature = "source-span")]
 use super::span::SourceSpan;
-use crate::VecSet;
 use crate::dom::vecmap::VecMap;
+use crate::{Attribute, VecSet};
+use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use serde::Serialize;
+use std::borrow::Cow;
 use std::default::Default;
 
 /// Normal: `<div></div>` or Void: `<meta/>`and `<meta>`
@@ -17,48 +19,49 @@ pub enum ElementVariant {
     Void,
 }
 
-pub type Attributes = VecMap<String, Option<String>>;
+pub type Attributes<'a> = VecMap<Cow<'a, str>, Option<Attribute<'a>>>;
 
 /// Most of the parsed html nodes are elements, except for text
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Serialize, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
 #[serde(rename_all = "camelCase")]
-pub struct Element {
+pub struct Element<'a> {
     /// The id of the element
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    pub id: Option<Attribute<'a>>,
 
     /// The name / tag of the element
-    pub name: String,
+    pub name: Cow<'a, str>,
 
     /// The element variant, if it is of type void or not
+    #[ownable(clone)]
     pub variant: ElementVariant,
 
     /// All of the elements attributes, except id and class
     #[serde(skip_serializing_if = "VecMap::is_empty")]
-    pub attributes: Attributes,
+    pub attributes: Attributes<'a>,
 
     /// All of the elements classes
     #[serde(skip_serializing_if = "VecSet::is_empty")]
-    pub classes: VecSet<String>,
+    pub classes: VecSet<Attribute<'a>>,
 
     /// All of the elements child nodes
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub children: Vec<Node>,
+    pub children: Vec<Node<'a>>,
 
     #[cfg(feature = "source-span")]
     /// Span of the element in the parsed source
     #[serde(skip)]
-    pub source_span: SourceSpan,
+    pub source_span: SourceSpan<'a>,
 }
 
-impl Default for Element {
+impl Default for Element<'static> {
     fn default() -> Self {
         Self {
             id: None,
-            name: "".to_string(),
+            name: "".into(),
             variant: ElementVariant::Void,
-            classes: VecSet::default(),
-            attributes: VecMap::default(),
+            classes: Default::default(),
+            attributes: Default::default(),
             children: vec![],
             #[cfg(feature = "source-span")]
             source_span: SourceSpan::default(),

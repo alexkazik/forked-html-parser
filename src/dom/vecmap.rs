@@ -1,3 +1,4 @@
+use ownable::traits::{IntoOwned, ToBorrowed, ToOwned};
 use serde::{Serialize, Serializer};
 use std::borrow::Borrow;
 use std::fmt::{Debug, Formatter};
@@ -118,6 +119,38 @@ impl<K, V> Iterator for IntoIter<K, V> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next()
+    }
+}
+
+impl<'a, K: ToBorrowed<'a>, V: ToBorrowed<'a>> ToBorrowed<'a> for VecMap<K, V> {
+    fn to_borrowed(&'a self) -> Self {
+        VecMap(
+            self.iter()
+                .map(|(k, v)| (k.to_borrowed(), v.to_borrowed()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: ToOwned, V: ToOwned> ToOwned for VecMap<K, V> {
+    type Owned = VecMap<K::Owned, V::Owned>;
+    fn to_owned(&self) -> Self::Owned {
+        VecMap(
+            self.iter()
+                .map(|(k, v)| (k.to_owned(), v.to_owned()))
+                .collect(),
+        )
+    }
+}
+
+impl<K: IntoOwned, V: IntoOwned> IntoOwned for VecMap<K, V> {
+    type Owned = VecMap<K::Owned, V::Owned>;
+    fn into_owned(self) -> Self::Owned {
+        VecMap(
+            self.into_iter()
+                .map(|(k, v)| (k.into_owned(), v.into_owned()))
+                .collect(),
+        )
     }
 }
 
