@@ -2,7 +2,7 @@
 name = "html_parser"
 version = "0.7.0"
 authors = ["Mathias Iversen <work@mathiasiversen.com>"]
-edition = "2018"
+edition = "2024"
 repository = "https://github.com/mathiversen/html-parser"
 license = "MIT"
 description = "A simple and general purpose html/xhtml parser"
@@ -21,7 +21,7 @@ doc-comment = "0.3.3"
 
 [dev-dependencies]
 indoc = "2.0.1"
-insta = { version = "1.29.0", features = ["json"]}
+insta = { version = "1.29.0", features = ["json"] }
 tempfile = "3.5.0"
 criterion = "0.4.0"
 reqwest = { version = "0.11.16", features = ["blocking", "rustls-tls"] }

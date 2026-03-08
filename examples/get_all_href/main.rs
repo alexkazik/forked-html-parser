@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     let iter = dom.children.get(0).unwrap().into_iter();
 
     let hrefs = iter.filter_map(|item| match item {
-        Node::Element(ref element) if element.name == "a" => element.attributes["href"].clone(),
+        Node::Element(element) if element.name == "a" => element.attributes["href"].clone(),
         _ => None,
     });
 

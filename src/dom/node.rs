@@ -56,7 +56,7 @@ impl<'a> Iterator for NodeIntoIterator<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         // Get first child
         let child = match self.node {
-            Node::Element(ref e) => e.children.get(0),
+            Node::Element(e) => e.children.get(0),
             _ => None,
         };
 
@@ -76,7 +76,7 @@ impl<'a> Iterator for NodeIntoIterator<'a> {
                     // Try to get the next sibling of the parent node
                     if let Some((sibling_index, parent)) = self.index.pop() {
                         let next_sibling = sibling_index + 1;
-                        let sibling = if let Node::Element(ref e) = parent {
+                        let sibling = if let Node::Element(e) = parent {
                             e.children.get(next_sibling)
                         } else {
                             None

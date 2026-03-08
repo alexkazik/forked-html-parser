@@ -1,11 +1,11 @@
 use crate::Result;
-use pest::{iterators::Pair, iterators::Pairs, Parser};
+use pest::{Parser, iterators::Pair, iterators::Pairs};
 use serde::Serialize;
 use std::default::Default;
 
+use crate::Rule;
 use crate::error::Error;
 use crate::grammar::Grammar;
-use crate::Rule;
 
 pub mod element;
 pub mod formatting;
@@ -198,7 +198,7 @@ impl Dom {
                 for node in &dom.children {
                     match node {
                         // Nodes other than <HTML> - reject <HEAD> and <BODY>
-                        Node::Element(ref el) if el.name.clone().to_lowercase() != "html" => {
+                        Node::Element(el) if el.name.clone().to_lowercase() != "html" => {
                             if el.name == "head" || el.name == "body" {
                                 return Err(Error::Parsing(format!(
                                     "A document fragment should not include {}",
@@ -208,7 +208,7 @@ impl Dom {
                             seen_elements = true;
                         }
                         // <HTML> Nodes - one (before any other elements) is okay
-                        Node::Element(ref el) if el.name.clone().to_lowercase() == "html" => {
+                        Node::Element(el) if el.name.clone().to_lowercase() == "html" => {
                             if seen_html || seen_elements {
                                 return Err(Error::Parsing(format!(
                                     "A document fragment should not include {}",
@@ -314,7 +314,7 @@ impl Dom {
                     return Err(Error::Parsing(format!(
                         "Failed to create element at rule: {:?}",
                         pair.as_rule()
-                    )))
+                    )));
                 }
             }
         }
@@ -348,7 +348,7 @@ impl Dom {
                             return Err(Error::Parsing(format!(
                                 "Failed to parse attr value: {:?}",
                                 inner_pair.as_rule()
-                            )))
+                            )));
                         }
                     }
                 }
@@ -356,7 +356,7 @@ impl Dom {
                     return Err(Error::Parsing(format!(
                         "Failed to parse attr: {:?}",
                         pair.as_rule()
-                    )))
+                    )));
                 }
             }
         }
