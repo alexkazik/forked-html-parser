@@ -1,4 +1,5 @@
 use super::node::Node;
+#[cfg(feature = "source-span")]
 use super::span::SourceSpan;
 use serde::{Serialize, Serializer};
 use std::collections::{BTreeMap, HashMap};
@@ -45,6 +46,7 @@ pub struct Element {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub children: Vec<Node>,
 
+    #[cfg(feature = "source-span")]
     /// Span of the element in the parsed source
     #[serde(skip)]
     pub source_span: SourceSpan,
@@ -59,6 +61,7 @@ impl Default for Element {
             classes: vec![],
             attributes: HashMap::new(),
             children: vec![],
+            #[cfg(feature = "source-span")]
             source_span: SourceSpan::default(),
         }
     }

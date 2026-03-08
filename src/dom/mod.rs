@@ -10,8 +10,10 @@ use crate::grammar::Grammar;
 pub mod element;
 pub mod formatting;
 pub mod node;
+#[cfg(feature = "source-span")]
 pub mod span;
 
+#[cfg(feature = "source-span")]
 use crate::dom::span::SourceSpan;
 use element::{Element, ElementVariant};
 use node::Node;
@@ -232,22 +234,21 @@ impl Dom {
     }
 
     fn build_node_element(pair: Pair<Rule>, dom: &mut Dom) -> Result<Option<Node>> {
-        let source_span = {
-            let pair_span = pair.as_span();
-            let (start_line, start_column) = pair_span.start_pos().line_col();
-            let (end_line, end_column) = pair_span.end_pos().line_col();
-
-            SourceSpan::new(
-                String::from(pair_span.as_str()),
-                start_line,
-                end_line,
-                start_column,
-                end_column,
-            )
-        };
-
         let mut element = Element {
-            source_span,
+            #[cfg(feature = "source-span")]
+            source_span: {
+                let pair_span = pair.as_span();
+                let (start_line, start_column) = pair_span.start_pos().line_col();
+                let (end_line, end_column) = pair_span.end_pos().line_col();
+
+                SourceSpan::new(
+                    String::from(pair_span.as_str()),
+                    start_line,
+                    end_line,
+                    start_column,
+                    end_column,
+                )
+            },
             ..Element::default()
         };
 
