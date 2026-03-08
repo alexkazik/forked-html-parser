@@ -16,7 +16,8 @@ fn it_prints_out_processing_error() -> Result<()> {
     let mut file = NamedTempFile::new()?;
     file.write_all(html.as_bytes())?;
 
-    let output = Command::new("./target/debug/examples/simple_parser")
+    let output = Command::new("cargo")
+        .args(["run", "--example", "simple_parser", "--"])
         .arg("-d")
         .arg(file.path())
         .output()
