@@ -12,6 +12,8 @@ pub mod formatting;
 pub mod node;
 #[cfg(feature = "source-span")]
 pub mod span;
+pub mod vecmap;
+pub mod vecset;
 
 #[cfg(feature = "source-span")]
 use crate::dom::span::SourceSpan;
@@ -291,7 +293,7 @@ impl Dom {
                                 if let Some(classes) = attr_value {
                                     let classes = classes.split_whitespace().collect::<Vec<_>>();
                                     for class in classes {
-                                        element.classes.push(class.to_string());
+                                        element.classes.insert(class.to_string());
                                     }
                                 }
                             }

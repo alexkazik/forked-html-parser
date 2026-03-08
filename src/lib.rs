@@ -108,5 +108,7 @@ pub use crate::dom::element::{Element, ElementVariant};
 pub use crate::dom::node::Node;
 #[cfg(feature = "source-span")]
 pub use crate::dom::span::SourceSpan;
+pub use crate::dom::vecmap::VecMap;
+pub use crate::dom::vecset::VecSet;
 pub use crate::error::Error;
 pub use crate::error::Result;

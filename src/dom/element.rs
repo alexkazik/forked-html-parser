@@ -1,10 +1,10 @@
 use super::node::Node;
 #[cfg(feature = "source-span")]
 use super::span::SourceSpan;
-use serde::{Serialize, Serializer};
-use std::collections::{BTreeMap, HashMap};
+use crate::VecSet;
+use crate::dom::vecmap::VecMap;
+use serde::Serialize;
 use std::default::Default;
-use std::result::Result;
 
 /// Normal: `<div></div>` or Void: `<meta/>`and `<meta>`
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -17,7 +17,7 @@ pub enum ElementVariant {
     Void,
 }
 
-pub type Attributes = HashMap<String, Option<String>>;
+pub type Attributes = VecMap<String, Option<String>>;
 
 /// Most of the parsed html nodes are elements, except for text
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -34,13 +34,12 @@ pub struct Element {
     pub variant: ElementVariant,
 
     /// All of the elements attributes, except id and class
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    #[serde(serialize_with = "ordered_map")]
+    #[serde(skip_serializing_if = "VecMap::is_empty")]
     pub attributes: Attributes,
 
     /// All of the elements classes
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub classes: Vec<String>,
+    #[serde(skip_serializing_if = "VecSet::is_empty")]
+    pub classes: VecSet<String>,
 
     /// All of the elements child nodes
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -58,16 +57,11 @@ impl Default for Element {
             id: None,
             name: "".to_string(),
             variant: ElementVariant::Void,
-            classes: vec![],
-            attributes: HashMap::new(),
+            classes: VecSet::default(),
+            attributes: VecMap::default(),
             children: vec![],
             #[cfg(feature = "source-span")]
             source_span: SourceSpan::default(),
         }
     }
-}
-
-fn ordered_map<S: Serializer>(value: &Attributes, serializer: S) -> Result<S::Ok, S::Error> {
-    let ordered: BTreeMap<_, _> = value.iter().collect();
-    ordered.serialize(serializer)
 }
