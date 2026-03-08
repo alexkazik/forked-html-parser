@@ -5,7 +5,7 @@ use html_parser::{Dom, Node, Result};
 fn main() -> Result<()> {
     let html = include_str!("./index.html");
     let dom = Dom::parse(html)?;
-    let iter = dom.children.get(0).unwrap().into_iter();
+    let iter = dom.children.first().unwrap().into_iter();
 
     let hrefs = iter.filter_map(|item| match item {
         Node::Element(element) if element.name == "a" => element.attributes["href"].clone(),

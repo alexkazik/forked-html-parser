@@ -177,14 +177,13 @@ impl Dom {
                 if dom
                     .children
                     .iter()
-                    .filter(|x| match x {
-                        Node::Element(el) if el.name.to_lowercase() == "html" => true,
-                        _ => false,
-                    })
+                    .filter(|x| matches!(x, Node::Element(el) if el.name.to_lowercase() == "html"))
                     .count()
                     > 1
                 {
-                    return Err(Error::Parsing(format!("Document with multiple HTML tags",)));
+                    return Err(Error::Parsing(
+                        "Document with multiple HTML tags".to_string(),
+                    ));
                 }
             }
 
@@ -318,7 +317,7 @@ impl Dom {
                 }
             }
         }
-        if element.name != "" {
+        if !element.name.is_empty() {
             Ok(Some(Node::Element(element)))
         } else {
             Ok(None)
@@ -336,11 +335,7 @@ impl Dom {
                     attribute.1 = Some(pair.as_str().trim().to_string());
                 }
                 Rule::attr_quoted => {
-                    let inner_pair = pair
-                        .into_inner()
-                        .into_iter()
-                        .next()
-                        .expect("attribute value");
+                    let inner_pair = pair.into_inner().next().expect("attribute value");
 
                     match inner_pair.as_rule() {
                         Rule::attr_value => attribute.1 = Some(inner_pair.as_str().to_string()),

@@ -56,11 +56,11 @@ impl<'a> Iterator for NodeIntoIterator<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         // Get first child
         let child = match self.node {
-            Node::Element(e) => e.children.get(0),
+            Node::Element(e) => e.children.first(),
             _ => None,
         };
 
-        let result = match child {
+        match child {
             // If element has child, return child
             Some(child) => {
                 self.index.push((0, self.node));
@@ -68,7 +68,7 @@ impl<'a> Iterator for NodeIntoIterator<'a> {
                 Some(child)
             }
             // If element doesn't have a child, but is a child of another node
-            None if self.index.len() > 0 => {
+            None if !self.index.is_empty() => {
                 let mut has_finished = false;
                 let mut next_node = None;
 
@@ -101,9 +101,7 @@ impl<'a> Iterator for NodeIntoIterator<'a> {
                 next_node
             }
             _ => None,
-        };
-
-        result
+        }
     }
 }
 

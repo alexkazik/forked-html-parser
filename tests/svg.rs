@@ -41,5 +41,5 @@ fn it_can_parse_complex_svg() {
         </svg>
     "#
     );
-    assert!(Dom::parse(&svg).is_ok());
+    assert!(Dom::parse(svg).is_ok());
 }
