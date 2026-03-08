@@ -106,5 +106,6 @@ pub use crate::dom::Dom;
 pub use crate::dom::DomVariant;
 pub use crate::dom::element::{Element, ElementVariant};
 pub use crate::dom::node::Node;
+pub use crate::dom::span::SourceSpan;
 pub use crate::error::Error;
 pub use crate::error::Result;
