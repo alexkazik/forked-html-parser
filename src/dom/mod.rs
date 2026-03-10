@@ -20,6 +20,7 @@ pub mod vecset;
 
 #[cfg(feature = "source-span")]
 use crate::dom::span::SourceSpan;
+use crate::for_each::ForEach;
 use element::{Element, ElementVariant};
 use node::Node;
 
@@ -367,5 +368,17 @@ impl<'a> Dom<'a> {
             }
         }
         Ok(attribute)
+    }
+}
+
+impl<'a> ForEach<'a> for Dom<'a> {
+    #[inline]
+    fn root(&self) -> &[Node<'a>] {
+        self.children.as_slice()
+    }
+
+    #[inline]
+    fn root_mut(&mut self) -> &mut [Node<'a>] {
+        self.children.as_mut_slice()
     }
 }

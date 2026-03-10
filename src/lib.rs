@@ -98,6 +98,7 @@
 
 mod dom;
 mod error;
+pub mod for_each;
 mod grammar;
 
 use grammar::Rule;

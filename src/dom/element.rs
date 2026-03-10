@@ -2,6 +2,7 @@ use super::node::Node;
 #[cfg(feature = "source-span")]
 use super::span::SourceSpan;
 use crate::dom::vecmap::VecMap;
+use crate::for_each::ForEach;
 use crate::{Attribute, VecSet};
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use serde::Serialize;
@@ -66,5 +67,17 @@ impl Default for Element<'static> {
             #[cfg(feature = "source-span")]
             source_span: SourceSpan::default(),
         }
+    }
+}
+
+impl<'a> ForEach<'a> for Element<'a> {
+    #[inline]
+    fn root(&self) -> &[Node<'a>] {
+        self.children.as_slice()
+    }
+
+    #[inline]
+    fn root_mut(&mut self) -> &mut [Node<'a>] {
+        self.children.as_mut_slice()
     }
 }

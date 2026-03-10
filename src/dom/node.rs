@@ -1,7 +1,9 @@
 use super::element::Element;
 use crate::Text;
+use crate::for_each::ForEach;
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use serde::Serialize;
+use std::array;
 
 #[derive(Debug, Serialize, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
 #[serde(untagged)]
@@ -45,6 +47,18 @@ impl<'a> Node<'a> {
             Node::Comment(t) => Some(t),
             _ => None,
         }
+    }
+}
+
+impl<'a> ForEach<'a> for Node<'a> {
+    #[inline]
+    fn root(&self) -> &[Node<'a>] {
+        array::from_ref(self)
+    }
+
+    #[inline]
+    fn root_mut(&mut self) -> &mut [Node<'a>] {
+        array::from_mut(self)
     }
 }
 
