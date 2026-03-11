@@ -1,4 +1,4 @@
-use super::node::Node;
+use super::node::{Node, write_html_list};
 #[cfg(feature = "source-span")]
 use super::span::SourceSpan;
 use crate::dom::vecmap::VecMap;
@@ -79,5 +79,61 @@ impl<'a> ForEach<'a> for Element<'a> {
     #[inline]
     fn root_mut(&mut self) -> &mut [Node<'a>] {
         self.children.as_mut_slice()
+    }
+}
+
+impl Element<'_> {
+    #[inline(always)]
+    pub fn to_html(&self) -> String {
+        let mut result = String::new();
+        self.write_html(&mut result);
+        result
+    }
+
+    pub fn write_html(&self, writer: &mut String) {
+        let e = self;
+
+        writer.push('<');
+        writer.push_str(&e.name);
+        if !e.classes.is_empty() {
+            writer.push_str(" class=\"");
+            writer.push_str(
+                &e.classes
+                    .iter()
+                    .map(|c| c.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            );
+            writer.push('"');
+        }
+        if let Some(id) = &e.id {
+            writer.push(' ');
+            writer.push_str("id");
+            writer.push('=');
+            writer.push('"');
+            writer.push_str(id);
+            writer.push('"');
+        }
+        for (k, v) in e.attributes.iter() {
+            writer.push(' ');
+            writer.push_str(k);
+            if let Some(v) = v {
+                writer.push('=');
+                writer.push('"');
+                writer.push_str(v);
+                writer.push('"');
+            }
+        }
+        if e.variant == ElementVariant::Normal {
+            writer.push('>');
+            write_html_list(writer, &e.children);
+            writer.push('<');
+            writer.push('/');
+            writer.push_str(&e.name);
+            writer.push('>');
+        } else {
+            writer.push('/');
+            writer.push('>');
+        }
     }
 }

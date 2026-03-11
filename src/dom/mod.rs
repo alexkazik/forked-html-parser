@@ -18,6 +18,7 @@ pub mod span;
 pub mod vecmap;
 pub mod vecset;
 
+use crate::dom::node::write_html_list;
 #[cfg(feature = "source-span")]
 use crate::dom::span::SourceSpan;
 use crate::for_each::ForEach;
@@ -368,6 +369,18 @@ impl<'a> Dom<'a> {
             }
         }
         Ok(attribute)
+    }
+
+    #[inline(always)]
+    pub fn to_html(&self) -> String {
+        let mut result = String::new();
+        self.write_html(&mut result);
+        result
+    }
+
+    #[inline(always)]
+    pub fn write_html(&self, writer: &mut String) {
+        write_html_list(writer, self.children.as_slice());
     }
 }
 

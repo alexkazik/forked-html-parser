@@ -62,6 +62,36 @@ impl<'a> ForEach<'a> for Node<'a> {
     }
 }
 
+impl Node<'_> {
+    #[inline]
+    pub fn to_html(&self) -> String {
+        let mut result = String::new();
+        self.write_html(&mut result);
+        result
+    }
+
+    #[inline]
+    pub fn write_html(&self, writer: &mut String) {
+        match self {
+            Node::Text(s) => {
+                writer.push_str(s);
+            }
+            Node::Element(e) => e.write_html(writer),
+            Node::Comment(c) => {
+                writer.push_str("<!--");
+                writer.push_str(c);
+                writer.push_str("-->");
+            }
+        }
+    }
+}
+
+pub(crate) fn write_html_list(writer: &mut String, list: &[Node]) {
+    for n in list {
+        n.write_html(writer);
+    }
+}
+
 impl<'a> IntoIterator for &'a Node<'a> {
     type Item = &'a Node<'a>;
     type IntoIter = NodeIntoIterator<'a>;
