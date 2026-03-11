@@ -1,5 +1,6 @@
 use crate::VecMap;
 use ownable::traits::{IntoOwned, ToBorrowed, ToOwned};
+#[cfg(feature = "test")]
 use serde::{Serialize, Serializer};
 use std::borrow::Borrow;
 use std::fmt::{Debug, Formatter};
@@ -109,6 +110,7 @@ impl<K: IntoOwned> IntoOwned for VecSet<K> {
     }
 }
 
+#[cfg(feature = "test")]
 impl<K> Serialize for VecSet<K>
 where
     K: Serialize,

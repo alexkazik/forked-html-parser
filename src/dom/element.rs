@@ -6,13 +6,15 @@ use crate::for_each::ForEach;
 use crate::{Attribute, Text, VecSet};
 use html_escape::decode_html_entities;
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
+#[cfg(feature = "test")]
 use serde::Serialize;
 use std::borrow::Cow;
 use std::default::Default;
 
 /// Normal: `<div></div>` or Void: `<meta/>`and `<meta>`
-#[derive(Debug, Clone, Serialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, PartialEq)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(rename_all = "camelCase"))]
 // TODO: Align with: https://html.spec.whatwg.org/multipage/syntax.html#elements-2
 pub enum ElementVariant {
     /// A normal element can have children, ex: <div></div>.
@@ -24,11 +26,12 @@ pub enum ElementVariant {
 pub type Attributes<'a> = VecMap<Cow<'a, str>, Option<Attribute<'a>>>;
 
 /// Most of the parsed html nodes are elements, except for text
-#[derive(Debug, Serialize, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, IntoOwned, ToBorrowed, ToOwned)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(rename_all = "camelCase"))]
 pub struct Element<'a> {
     /// The id of the element
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "test", serde(skip_serializing_if = "Option::is_none"))]
     pub id: Option<Attribute<'a>>,
 
     /// The name / tag of the element
@@ -39,20 +42,20 @@ pub struct Element<'a> {
     pub variant: ElementVariant,
 
     /// All of the elements attributes, except id and class
-    #[serde(skip_serializing_if = "VecMap::is_empty")]
+    #[cfg_attr(feature = "test", serde(skip_serializing_if = "VecMap::is_empty"))]
     pub attributes: Attributes<'a>,
 
     /// All of the elements classes
-    #[serde(skip_serializing_if = "VecSet::is_empty")]
+    #[cfg_attr(feature = "test", serde(skip_serializing_if = "VecSet::is_empty"))]
     pub classes: VecSet<Attribute<'a>>,
 
     /// All of the elements child nodes
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[cfg_attr(feature = "test", serde(skip_serializing_if = "Vec::is_empty"))]
     pub children: Vec<Node<'a>>,
 
     #[cfg(feature = "source-span")]
     /// Span of the element in the parsed source
-    #[serde(skip)]
+    #[cfg_attr(feature = "test", serde(skip))]
     pub source_span: SourceSpan<'a>,
 }
 

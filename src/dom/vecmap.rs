@@ -1,4 +1,5 @@
 use ownable::traits::{IntoOwned, ToBorrowed, ToOwned};
+#[cfg(feature = "test")]
 use serde::{Serialize, Serializer};
 use std::borrow::Borrow;
 use std::fmt::{Debug, Formatter};
@@ -166,6 +167,7 @@ where
     }
 }
 
+#[cfg(feature = "test")]
 impl<K, V> Serialize for VecMap<K, V>
 where
     K: Serialize,

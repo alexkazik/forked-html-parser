@@ -1,5 +1,6 @@
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
 use pest::{Parser, iterators::Pair, iterators::Pairs};
+#[cfg(feature = "test")]
 use serde::Serialize;
 use std::borrow::Cow;
 use std::default::Default;
@@ -26,8 +27,9 @@ use element::{Element, ElementVariant};
 use node::Node;
 
 /// Document, DocumentFragment or Empty
-#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(rename_all = "camelCase"))]
 pub enum DomVariant {
     /// This means that the parsed html had the representation of an html document. The doctype is optional but a document should only have one root node with the name of html.
     /// Example:
@@ -52,19 +54,20 @@ pub enum DomVariant {
 }
 
 /// **The main struct** & the result of the parsed html
-#[derive(Debug, Serialize, PartialEq, ToBorrowed, ToOwned, IntoOwned)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, ToBorrowed, ToOwned, IntoOwned)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(rename_all = "camelCase"))]
 pub struct Dom<'a> {
     /// The type of the tree that was parsed
     #[ownable(clone)]
     pub tree_type: DomVariant,
 
     /// All of the root children in the tree
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[cfg_attr(feature = "test", serde(skip_serializing_if = "Vec::is_empty"))]
     pub children: Vec<Node<'a>>,
 
     /// A collection of all errors during parsing
-    #[serde(skip_serializing)]
+    #[cfg_attr(feature = "test", serde(skip_serializing))]
     #[ownable(clone)]
     pub errors: Vec<String>,
 }
@@ -88,10 +91,12 @@ impl<'a> Dom<'a> {
         Self::build_dom(pairs)
     }
 
+    #[cfg(feature = "test")]
     pub fn to_json(&self) -> Result<String> {
         Ok(serde_json::to_string(self)?)
     }
 
+    #[cfg(feature = "test")]
     pub fn to_json_pretty(&self) -> Result<String> {
         Ok(serde_json::to_string_pretty(self)?)
     }
@@ -177,7 +182,10 @@ impl<'a> Dom<'a> {
                     } else {
                         // Anything else (i.e. Text() or Element() ) can't happen at the top level;
                         // if we had seen one, we would have set the document type above
-                        unreachable!("[build dom] empty document with an Element {:?}", node)
+                        unreachable!(
+                            "[build dom] empty document with an Element {:?}",
+                            node.to_html()
+                        )
                     }
                 }
             }

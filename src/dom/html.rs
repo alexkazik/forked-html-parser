@@ -1,12 +1,14 @@
 use html_escape::{decode_html_entities, encode_text};
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
+#[cfg(feature = "test")]
 use serde::Serialize;
 use std::borrow::{Borrow, Cow};
 use std::fmt::{Debug, Formatter};
 use std::ops::Deref;
 
-#[derive(Default, Debug, Serialize, PartialEq, Eq, IntoOwned, ToBorrowed, ToOwned)]
-#[serde(transparent)]
+#[derive(Default, PartialEq, Eq, IntoOwned, ToBorrowed, ToOwned)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(transparent))]
 pub struct Attribute<'a>(pub Cow<'a, str>);
 
 impl<'a> Attribute<'a> {
@@ -53,8 +55,9 @@ impl Borrow<str> for Attribute<'_> {
     }
 }
 
-#[derive(Default, Serialize, PartialEq, Eq, IntoOwned, ToBorrowed, ToOwned)]
-#[serde(transparent)]
+#[derive(Default, PartialEq, Eq, IntoOwned, ToBorrowed, ToOwned)]
+#[cfg_attr(feature = "test", derive(Serialize))]
+#[cfg_attr(feature = "test", serde(transparent))]
 pub struct Text<'a>(pub Cow<'a, str>);
 
 impl<'a> Text<'a> {

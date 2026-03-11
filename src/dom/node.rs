@@ -3,12 +3,14 @@ use crate::Text;
 use crate::for_each::ForEach;
 use html_escape::decode_html_entities;
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
+#[cfg(feature = "test")]
 use serde::Serialize;
 use std::array;
 use std::borrow::Cow;
 
-#[derive(Debug, Serialize, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
-#[serde(untagged)]
+#[derive(PartialEq, IntoOwned, ToBorrowed, ToOwned)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(untagged))]
 pub enum Node<'a> {
     Text(Text<'a>),
     Element(Element<'a>),
@@ -188,6 +190,7 @@ impl<'a> Iterator for NodeIntoIterator<'a> {
     }
 }
 
+#[cfg(feature = "test")]
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,10 +1,12 @@
 use ownable::{IntoOwned, ToBorrowed, ToOwned};
+#[cfg(feature = "test")]
 use serde::Serialize;
 use std::borrow::Cow;
 
 /// Span of the information in the parsed source.
-#[derive(Debug, Default, Clone, Serialize, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
-#[serde(rename_all = "camelCase")]
+#[derive(Default, Clone, PartialEq, IntoOwned, ToBorrowed, ToOwned)]
+#[cfg_attr(feature = "test", derive(Debug, Serialize))]
+#[cfg_attr(feature = "test", serde(rename_all = "camelCase"))]
 pub struct SourceSpan<'a> {
     pub text: Cow<'a, str>,
     pub start_line: usize,
