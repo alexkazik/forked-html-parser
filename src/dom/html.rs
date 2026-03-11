@@ -46,6 +46,12 @@ impl<'a> PartialEq<str> for &Attribute<'a> {
     }
 }
 
+impl Borrow<str> for Attribute<'_> {
+    fn borrow(&self) -> &str {
+        self.as_str()
+    }
+}
+
 #[derive(Default, Serialize, PartialEq, Eq, IntoOwned, ToBorrowed, ToOwned)]
 #[serde(transparent)]
 pub struct Text<'a>(pub Cow<'a, str>);

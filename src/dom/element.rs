@@ -83,6 +83,11 @@ impl<'a> ForEach<'a> for Element<'a> {
 }
 
 impl Element<'_> {
+    #[inline]
+    pub fn has_class(&self, class: &str) -> bool {
+        self.classes.contains_key(class)
+    }
+
     #[inline(always)]
     pub fn to_html(&self) -> String {
         let mut result = String::new();
